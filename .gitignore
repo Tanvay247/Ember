@@ -1,1 +1,4 @@
 /target
+boot-bios.img
+target/
+tools/make_image/target/

@@ -1,3 +1,4 @@
+#![feature(abi_x86_interrupt)]
 #![no_std]
 #![no_main]
 
@@ -6,24 +7,27 @@ use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::sync::atomic::{AtomicBool, Ordering};
 use uart_16550::SerialPort;
+use x86_64::instructions::interrupts as x86_interrupts;
+
+mod gdt;
+mod interrupts;
+#[macro_use]
+mod serial;
 
 static PANICKED: AtomicBool = AtomicBool::new(false);
 
 entry_point!(kernel_main);
 
 fn kernel_main(_boot_info: &'static mut BootInfo) -> ! {
-    let mut serial_port = unsafe {
-        SerialPort::new(0x3F8)
-    };
+    gdt::init();
+    interrupts::init_idt();
 
-    serial_port.init();
+    println!("[BOOT OK]");
+    println!("Ember kernel initialized");
 
-    writeln!(serial_port, "[BOOT OK]").ok();
-    writeln!(serial_port, "Hello from Rust Unikernel").ok();
+    x86_interrupts::int3();
 
-    loop {
-        core::hint::spin_loop();
-    }
+    loop {}
 }
 
 #[panic_handler]
