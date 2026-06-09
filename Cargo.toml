@@ -9,7 +9,6 @@ uart_16550 = "0.3"
 x86_64 = "0.14"
 lazy_static = { version = "1.4", features = ["spin_no_std"] }
 spin = "0.9"
-bootloader = "0.11.15"
 
 [profile.dev]
 panic = "abort"
